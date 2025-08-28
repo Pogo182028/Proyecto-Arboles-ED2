@@ -9,34 +9,40 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
 
     protected NodoBinario<T> raiz;
 
+    public ArbolBinarioBusqueda() {
+    }
+
     @Override
     public void insertar(T datoAInsertar) throws ExcepcionDatoYaExiste {
+        if (datoAInsertar == null) {
+            throw new IllegalArgumentException("Dato insertado no puede ser nulo");
+        }
+
         if (this.esArbolVacio()) {
             this.raiz = new NodoBinario<>(datoAInsertar);
             return;
         }
 
-        NodoBinario<T> nodoAnterior = NodoBinario.nodoVacio();
-        NodoBinario<T> nodoAuxiliar = this.raiz;
-
-        while (nodoAuxiliar != null) {
-            T datoNodoAux = nodoAuxiliar.getDato();
-            nodoAnterior = nodoAuxiliar;
-
-            if (datoAInsertar.compareTo(datoNodoAux) < 0) {
-                nodoAuxiliar = nodoAuxiliar.getHijoIzquierdo();
-            } else if (datoAInsertar.compareTo(datoNodoAux) > 0) {
-                nodoAuxiliar = nodoAuxiliar.getHijoDerecho();
+        NodoBinario<T> nodoAnt = NodoBinario.nodoVacio();
+        NodoBinario<T> nodoAux = this.raiz;
+        do {
+            T datoDelNodoAuxiliar = nodoAux.getDato();
+            nodoAnt = nodoAux;
+            if (datoAInsertar.compareTo(datoDelNodoAuxiliar) < 0) {
+                nodoAux = nodoAux.getHijoIzquierdo();
+            } else if (datoAInsertar.compareTo(datoDelNodoAuxiliar) > 0) {
+                nodoAux = nodoAux.getHijoDerecho();
             } else {
-                throw new ExcepcionDatoYaExiste("Dato ya existe");
+                throw new ExcepcionDatoYaExiste("El dato ya existe");
             }
-        }
+        } while (!NodoBinario.esNodoVacio(nodoAux));
 
-        NodoBinario<T> nodoNuevo = new NodoBinario<>(datoAInsertar);
-        if (datoAInsertar.compareTo(nodoNuevo.getDato()) < 0) {
-            nodoAnterior.setHijoIzquierdo(nodoNuevo);
+        NodoBinario<T> nuevoNodo = new NodoBinario<>(datoAInsertar);
+        T datoDelNodoAnterior = nodoAnt.getDato();
+        if (datoAInsertar.compareTo(datoDelNodoAnterior) < 0) {
+            nodoAnt.setHijoIzquierdo(nuevoNodo);
         } else {
-            nodoAnterior.setHijoDerecho(nodoNuevo);
+            nodoAnt.setHijoDerecho(nuevoNodo);
         }
     }
 
@@ -51,19 +57,19 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
     }
 
     @Override
-    public T buscar(T dato) {
-        NodoBinario<T> nodoAuxiliar = this.raiz;
-        while (nodoAuxiliar != null) {
-            T datoDelNodoAux = nodoAuxiliar.getDato();
+    public T buscar(T datoABuscar) {
+        NodoBinario<T> nodoAux = this.raiz;
+        do {
+            T datoDelNodoAuxiliar = nodoAux.getDato();
 
-            if (dato.compareTo(datoDelNodoAux) < 0) {
-                nodoAuxiliar = nodoAuxiliar.getHijoIzquierdo();
-            } else if (dato.compareTo(datoDelNodoAux) > 0) {
-                nodoAuxiliar = nodoAuxiliar.getHijoDerecho();
+            if (datoABuscar.compareTo(datoDelNodoAuxiliar) < 0) {
+                nodoAux = nodoAux.getHijoIzquierdo();
+            } else if (datoABuscar.compareTo(datoDelNodoAuxiliar) > 0) {
+                nodoAux = nodoAux.getHijoDerecho();
             } else {
-                return datoDelNodoAux;
+                return datoDelNodoAuxiliar;
             }
-        }
+        } while (!NodoBinario.esNodoVacio(nodoAux));
         return null;
     }
 
@@ -190,6 +196,7 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
     public String toString() {
         return generarCadenaDeArbol(this.raiz, "", true);
     }
+
 
     private String generarCadenaDeArbol(NodoBinario<T> nodo, String prefijo, boolean esUltimo) {
         if (NodoBinario.esNodoVacio(nodo)) {

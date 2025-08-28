@@ -36,11 +36,11 @@ public class NodoBinario<T> {
     }
 
     public boolean esVacioHijoIzquierdo() {
-        return esNodoVacio(this.hijoIzquierdo);
+        return NodoBinario.esNodoVacio(this.hijoIzquierdo);
     }
 
     public boolean esVacioHijoDerecho() {
-        return esNodoVacio(this.hijoDerecho);
+        return NodoBinario.esNodoVacio(this.hijoDerecho);
     }
 
     public boolean esHoja() {
