@@ -47,11 +47,11 @@ public class NodoBinario<T> {
         return (hijoIzquierdo == null && hijoDerecho == null);
     }
 
-    private static <T> boolean esNodoVacio(NodoBinario<T> nodo) {
+    public static <T> boolean esNodoVacio(NodoBinario<T> nodo) {
         return nodo == null;
     }
 
-    private static <T> NodoBinario<T> nodoVacio() {
+    public static <T> NodoBinario<T> nodoVacio() {
         return null;
     }
 }
