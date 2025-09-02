@@ -46,9 +46,80 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
         }
     }
 
+    /* Eliminar en un ABB
+     * El metodo eliminar en un ABB consta de tres casos:
+     * Caso 1: Cuando el dato a eliminar esta en una hoja
+     * Caso 2: Cuando el dato a eliminar esta en un nodo con 1 solo hijo no vacio
+     * Caso 3: Cuando el dato a eliminar esta en un nodo con 2 hijos no vacios
+     * Primeramente hay que buscar el nodo que queremos eliminar para poder luego
+     * verificar con que caso */
     @Override
-    public void eliminar(T dato) throws ExcepcionDatoNoExiste {
+    public void eliminar(T datoAEliminar) throws ExcepcionDatoNoExiste {
+        if (datoAEliminar == null) {
+            throw new IllegalArgumentException("Dato a eliminar no puede ser nulo");
+        }
+        this.raiz = this.eliminar(this.raiz, datoAEliminar);
+    }
 
+    private NodoBinario<T> eliminar(NodoBinario<T> nodoEnTurno, T datoAEliminar)
+            throws ExcepcionDatoNoExiste {
+        if (NodoBinario.esNodoVacio(nodoEnTurno)) {
+            throw new ExcepcionDatoNoExiste("Su dato no existe");
+        }
+
+        /* Esta parte busca el dato a eliminar y a la vez actualizara el nodo padre
+        * de donde nos encontramos, aunque no haya cambiado */
+        T datoDelNodoEnTurno = nodoEnTurno.getDato();
+        if (datoAEliminar.compareTo(datoDelNodoEnTurno) < 0) {
+            NodoBinario<T> supuestoNuevoHijoIzq =
+                    this.eliminar(nodoEnTurno.getHijoIzquierdo(), datoAEliminar);
+            nodoEnTurno.setHijoIzquierdo(supuestoNuevoHijoIzq);
+            return nodoEnTurno;
+        }
+
+        if (datoAEliminar.compareTo(datoDelNodoEnTurno) > 0) {
+            NodoBinario<T> supuestoNuevoHijoDer =
+                    this.eliminar(nodoEnTurno.getHijoDerecho(), datoAEliminar);
+            nodoEnTurno.setHijoDerecho(supuestoNuevoHijoDer);
+            return nodoEnTurno;
+        }
+
+        /* Si llego aca sabemos el nodo en turno tiene el dato a eliminar */
+        // Caso 1
+        if (nodoEnTurno.esHoja()) {
+            return NodoBinario.nodoVacio();
+        }
+
+        // Caso 2. a
+        if (!nodoEnTurno.esVacioHijoIzquierdo() &&
+                nodoEnTurno.esVacioHijoDerecho()) {
+            NodoBinario<T> nodoARetornar = nodoEnTurno.getHijoIzquierdo();
+            nodoEnTurno.setHijoIzquierdo(NodoBinario.nodoVacio());
+            return nodoARetornar;
+        }
+
+        // Caso 2. b
+        if (nodoEnTurno.esVacioHijoIzquierdo() &&
+                !nodoEnTurno.esVacioHijoDerecho()) {
+            NodoBinario<T> nodoARetornar = nodoEnTurno.getHijoDerecho();
+            nodoEnTurno.setHijoDerecho(NodoBinario.nodoVacio());
+            return nodoARetornar;
+        }
+
+        // Caso 3
+        T reemplazo = this.buscarSucesorInOrden(nodoEnTurno.getHijoDerecho());
+        NodoBinario<T> supuestoNuevoHijoDerecho = this.eliminar(nodoEnTurno.getHijoDerecho(),
+                reemplazo);
+        nodoEnTurno.setHijoDerecho(supuestoNuevoHijoDerecho);
+        nodoEnTurno.setDato(reemplazo);
+        return nodoEnTurno;
+    }
+
+    protected T buscarSucesorInOrden(NodoBinario<T> nodoAuxiliar) {
+        while (!nodoAuxiliar.esVacioHijoIzquierdo()) {
+            nodoAuxiliar = nodoAuxiliar.getHijoIzquierdo();
+        }
+        return nodoAuxiliar.getDato();
     }
 
     @Override
@@ -83,22 +154,55 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
         return this.buscar(dato) != null;
     }
 
+    /* Hacer este metodo */
+    public int sizeIt() {
+        return 0;
+    }
+
     @Override
     public int size() {
+        return size(this.raiz);
+    }
+
+    private int size(NodoBinario<T> nodoEnTurno) {
+        if (NodoBinario.esNodoVacio(nodoEnTurno)) {
+            return 0;
+        }
+
+        int sizeXIzq = this.size(nodoEnTurno.getHijoIzquierdo());
+        int sizeXDer = this.size(nodoEnTurno.getHijoDerecho());
+        return sizeXIzq + sizeXDer + 1;
+    }
+
+    /* Hacer este metodo */
+    public int alturaIt() {
         return 0;
     }
 
     @Override
     public int altura() {
-        return 0;
+        return altura(this.raiz);
     }
 
+    protected int altura(NodoBinario<T> nodoEnTurno) {
+        if (NodoBinario.esNodoVacio(nodoEnTurno)) {
+            return 0;
+        }
+        int alturaXIzq = this.altura(nodoEnTurno.getHijoIzquierdo());
+        int alturaXDer = this.altura(nodoEnTurno.getHijoDerecho());
+        if (alturaXIzq > alturaXDer) {
+            return alturaXIzq + 1;
+        }
+        return alturaXDer + 1;
+    }
+
+    /* Hacer este metodo */
     @Override
     public int nivel(T dato) {
         return 0;
     }
 
-    /* PreOrden Iterativo ---------------------------------------------------------
+    /* InOrden Iterativo ---------------------------------------------------------
     * Se define una listaDeRecorrido generica
     * Cuando el arbol no sea vacio
     * Se define una pila de nodos binarios
@@ -118,7 +222,7 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
     * En un proceso iterativo mientras la pila
       no sea vacia:
       * Sacamos el nodo que toca sacar de la otra pila y lo asignamos
-        al nodoEnTurno
+        a un nodoEnTurno
       * Agregamos a la lista del recorrido el dato del nodoEnTurno
       * Si el hijoDerecho del nodoEnTurno no es vacio lo agrega a la pila
       * Si el hijoIzquierdo del nodoEnTurno no es vacio lo agrega a la pila
@@ -136,7 +240,8 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
 
                 if (!nodoEnTurno.esVacioHijoDerecho()) {
                     pilaDeNodos.push(nodoEnTurno.getHijoDerecho());
-                } else if (!nodoEnTurno.esVacioHijoIzquierdo()) {
+                }
+                if (!nodoEnTurno.esVacioHijoIzquierdo()) {
                     pilaDeNodos.push(nodoEnTurno.getHijoIzquierdo());
                 }
             } while (!pilaDeNodos.isEmpty());
@@ -145,7 +250,7 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
     } // Fin Del Recorrido en PreOrden iterativo ---------------------------------
 
 
-    /* PreOrden Iterativo ---------------------------------------------------------
+    /* PostOrden Iterativo ---------------------------------------------------------
     * Se define una listaDeRecorrido generica
     * Cuando el arbol no sea vacio
     * Se define una pila de nodos binarios
