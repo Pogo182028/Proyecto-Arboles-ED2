@@ -68,7 +68,7 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
         }
 
         /* Esta parte busca el dato a eliminar y a la vez actualizara el nodo padre
-        * de donde nos encontramos, aunque no haya cambiado */
+         * de donde nos encontramos, aunque no haya cambiado */
         T datoDelNodoEnTurno = nodoEnTurno.getDato();
         if (datoAEliminar.compareTo(datoDelNodoEnTurno) < 0) {
             NodoBinario<T> supuestoNuevoHijoIzq =
@@ -108,8 +108,8 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
 
         // Caso 3
         T reemplazo = this.buscarSucesorInOrden(nodoEnTurno.getHijoDerecho());
-        NodoBinario<T> supuestoNuevoHijoDerecho = this.eliminar(nodoEnTurno.getHijoDerecho(),
-                reemplazo);
+        NodoBinario<T> supuestoNuevoHijoDerecho = this.eliminar(
+                nodoEnTurno.getHijoDerecho(), reemplazo);
         nodoEnTurno.setHijoDerecho(supuestoNuevoHijoDerecho);
         nodoEnTurno.setDato(reemplazo);
         return nodoEnTurno;
