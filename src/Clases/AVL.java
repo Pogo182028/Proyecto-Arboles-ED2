@@ -85,12 +85,34 @@ public class AVL<T extends Comparable<T>> extends ArbolBinarioBusqueda<T> {
         return nodoEnTurno;
     }
 
+    /* Rotacion Doble por Izquierda
+    * El primer paso es obtener el hijo derecho
+    * luego hay que hacer una rotacion simple a derecha y asignarlo a una variable
+    * luego asignamos como nuevo hijo derecho al nodoEnTurno
+    * por último retornamos la rotacion simple a izquierda del nodoEnTurno */
     private NodoBinario<T> rotacionDoblePorIzquierda(NodoBinario<T> nodoEnTurno) {
-        return null;
+        NodoBinario<T> nodoIzq = nodoEnTurno.getHijoIzquierdo();
+        NodoBinario<T> nuevoHijoIzq = rotacionSimplePorDerecha(nodoIzq);
+        nodoEnTurno.setHijoIzquierdo(nuevoHijoIzq);
+
+        return rotacionSimplePorIzquierda(nodoEnTurno);
     }
 
+    /* Rotacion Simple Por Izquierda
+     * Primeramente obtenemos el hijo derecho del nodoEnTurno y lo asignamos en una
+     * variable
+     * Luego tenemos que obtener el hijo izquierdo del nodoQueSube y asignarlo en una
+     * variable, por si es tiene algo
+     * Asignamos el hijoDelNodoQueSube como hijo derecho del nodoEnTurno
+     * Ahora sí, asignamos el nodoEnTurno como hijo derecho del nodoQueSube */
     private NodoBinario<T> rotacionSimplePorIzquierda(NodoBinario<T> nodoEnTurno) {
-        return null;
+        NodoBinario<T> nodoQueSube = nodoEnTurno.getHijoDerecho();
+
+        NodoBinario<T> hijoIzqDelNodoQueSube = nodoQueSube.getHijoIzquierdo();
+        nodoEnTurno.setHijoDerecho(hijoIzqDelNodoQueSube);
+
+        nodoQueSube.setHijoIzquierdo(nodoEnTurno);
+        return nodoQueSube;
     }
 
     private NodoBinario<T> rotacionDoblePorDerecha(NodoBinario<T> nodoEnTurno) {
@@ -103,7 +125,7 @@ public class AVL<T extends Comparable<T>> extends ArbolBinarioBusqueda<T> {
     * Luego tenemos que obtener el hijo derecho del nodoQueSube y asignarlo en una
     * variable, por si es tiene algo
     * Asignamos el hijoDelNodoQueSube como hijo izquierdo del nodoEnTurno
-    * Ahora si, asignamos el nodoEnTurno como hijo derecho del nodoQueSube */
+    * Ahora sí, asignamos el nodoEnTurno como hijo derecho del nodoQueSube */
     private NodoBinario<T> rotacionSimplePorDerecha(NodoBinario<T> nodoEnTurno) {
         NodoBinario<T> nodoQueSube = nodoEnTurno.getHijoIzquierdo();
 
@@ -128,7 +150,7 @@ public class AVL<T extends Comparable<T>> extends ArbolBinarioBusqueda<T> {
             throw new ExcepcionDatoNoExiste("Su dato no existe");
         }
 
-        /* Esta parte busca el dato a eliminar y a la vez actualizara el nodo padre
+        /* Esta parte busca el dato a eliminar y a la vez actualizará el nodo padre
          * de donde nos encontramos, aunque no haya cambiado */
         T datoDelNodoEnTurno = nodoEnTurno.getDato();
         if (datoAEliminar.compareTo(datoDelNodoEnTurno) < 0) {
