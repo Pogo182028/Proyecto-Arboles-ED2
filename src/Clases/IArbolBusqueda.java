@@ -19,4 +19,6 @@ public interface IArbolBusqueda<T extends Comparable<T>> {
     List<T> recorridoEnPreOrden();
     List<T> recorridoEnPostOrden();
     List<T> recorridoPorNiveles();
+    // Ejercicios
+    public int cuantosNodosHojas();
 }

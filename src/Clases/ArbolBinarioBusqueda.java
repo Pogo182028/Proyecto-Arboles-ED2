@@ -295,6 +295,30 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
         return listaDeRecorrido;
     } // Fin del Recorrido por Niveles -------------------------------------------------
 
+    // Ejercicios
+    // Retornar cuantos nodos hojas hay
+    public int cuantosNodosHojas() {
+        if (!esArbolVacio()) {
+            int nodosHoja = 0;
+            Queue<NodoBinario<T>> colaDeNodos = new LinkedList<>();
+            colaDeNodos.offer(this.raiz);
+            do {
+                NodoBinario<T> nodoAux = colaDeNodos.poll();
+                if (!nodoAux.esVacioHijoIzquierdo()) {
+                    colaDeNodos.offer(nodoAux.getHijoIzquierdo());
+                }
+                if (!nodoAux.esVacioHijoDerecho()) {
+                    colaDeNodos.offer(nodoAux.getHijoDerecho());
+                }
+                if (nodoAux.esHoja()){
+                    nodosHoja++;
+                }
+            } while (!colaDeNodos.isEmpty());
+
+            return nodosHoja;
+        }
+        return 0;
+    }
 
     // Representacion del arbol
     @Override

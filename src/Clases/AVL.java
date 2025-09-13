@@ -86,16 +86,17 @@ public class AVL<T extends Comparable<T>> extends ArbolBinarioBusqueda<T> {
     }
 
     /* Rotacion Doble por Izquierda
-    * El primer paso es obtener el hijo derecho
-    * luego hay que hacer una rotacion simple a derecha y asignarlo a una variable
-    * luego asignamos como nuevo hijo derecho al nodoEnTurno
-    * por último retornamos la rotacion simple a izquierda del nodoEnTurno */
+     * Primero debemos obtener el nodo hijo derecho del nodoEnTurno
+     * luego, debemos rotar (simple) por derecha y guardarlo en una variable
+     * asignar como nuevo hijo derecho al nodoEnturno
+     * retornar la rotacion simple por izquierda del nodoEnTurno */
     private NodoBinario<T> rotacionDoblePorIzquierda(NodoBinario<T> nodoEnTurno) {
-        NodoBinario<T> nodoIzq = nodoEnTurno.getHijoIzquierdo();
-        NodoBinario<T> nuevoHijoIzq = rotacionSimplePorDerecha(nodoIzq);
-        nodoEnTurno.setHijoIzquierdo(nuevoHijoIzq);
+        NodoBinario<T> nodoHijoDer = nodoEnTurno.getHijoDerecho();
 
-        return rotacionSimplePorIzquierda(nodoEnTurno);
+        NodoBinario<T> nuevoHijoDer = this.rotacionSimplePorDerecha(nodoHijoDer);
+        nodoEnTurno.setHijoDerecho(nuevoHijoDer);
+
+        return this.rotacionSimplePorIzquierda(nodoEnTurno);
     }
 
     /* Rotacion Simple Por Izquierda
@@ -115,8 +116,18 @@ public class AVL<T extends Comparable<T>> extends ArbolBinarioBusqueda<T> {
         return nodoQueSube;
     }
 
+    /* Rotacion Doble por Derecha
+    * Primero debemos obtener el nodo hijo izquierdo del nodoEnTurno
+    * luego, debemos rotar (simple) por izquierda y guardarlo en una variable
+    * asignar como nuevo hijo izquierdo al nodoEnturno
+    * retornar la rotacion simple por derecha del nodoEnTurno */
     private NodoBinario<T> rotacionDoblePorDerecha(NodoBinario<T> nodoEnTurno) {
-        return null;
+        NodoBinario<T> nodoHijoIzq = nodoEnTurno.getHijoIzquierdo();
+
+        NodoBinario<T> nuevoHijoIzq = rotacionSimplePorIzquierda(nodoHijoIzq);
+        nodoEnTurno.setHijoIzquierdo(nuevoHijoIzq);
+
+        return this.rotacionSimplePorDerecha(nodoEnTurno);
     }
 
     /* Rotacion Simple Por Derecha
