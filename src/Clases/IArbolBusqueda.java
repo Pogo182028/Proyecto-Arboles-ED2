@@ -20,5 +20,5 @@ public interface IArbolBusqueda<T extends Comparable<T>> {
     List<T> recorridoEnPostOrden();
     List<T> recorridoPorNiveles();
     // Ejercicios
-    public int cuantosNodosHojas();
+    //    public int cuantosNodosHojas(); ABB
 }
