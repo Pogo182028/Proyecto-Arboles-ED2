@@ -61,8 +61,7 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
         this.raiz = this.eliminar(this.raiz, datoAEliminar);
     }
 
-    private NodoBinario<T> eliminar(NodoBinario<T> nodoEnTurno, T datoAEliminar)
-            throws ExcepcionDatoNoExiste {
+    private NodoBinario<T> eliminar(NodoBinario<T> nodoEnTurno, T datoAEliminar) throws ExcepcionDatoNoExiste {
         if (NodoBinario.esNodoVacio(nodoEnTurno)) {
             throw new ExcepcionDatoNoExiste("Su dato no existe");
         }
@@ -71,15 +70,13 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
          * de donde nos encontramos, aunque no haya cambiado */
         T datoDelNodoEnTurno = nodoEnTurno.getDato();
         if (datoAEliminar.compareTo(datoDelNodoEnTurno) < 0) {
-            NodoBinario<T> supuestoNuevoHijoIzq =
-                    this.eliminar(nodoEnTurno.getHijoIzquierdo(), datoAEliminar);
+            NodoBinario<T> supuestoNuevoHijoIzq = this.eliminar(nodoEnTurno.getHijoIzquierdo(), datoAEliminar);
             nodoEnTurno.setHijoIzquierdo(supuestoNuevoHijoIzq);
             return nodoEnTurno;
         }
 
         if (datoAEliminar.compareTo(datoDelNodoEnTurno) > 0) {
-            NodoBinario<T> supuestoNuevoHijoDer =
-                    this.eliminar(nodoEnTurno.getHijoDerecho(), datoAEliminar);
+            NodoBinario<T> supuestoNuevoHijoDer = this.eliminar(nodoEnTurno.getHijoDerecho(), datoAEliminar);
             nodoEnTurno.setHijoDerecho(supuestoNuevoHijoDer);
             return nodoEnTurno;
         }
@@ -91,16 +88,14 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
         }
 
         // Caso 2. a
-        if (!nodoEnTurno.esVacioHijoIzquierdo() &&
-                nodoEnTurno.esVacioHijoDerecho()) {
+        if (!nodoEnTurno.esVacioHijoIzquierdo() && nodoEnTurno.esVacioHijoDerecho()) {
             NodoBinario<T> nodoARetornar = nodoEnTurno.getHijoIzquierdo();
             nodoEnTurno.setHijoIzquierdo(NodoBinario.nodoVacio());
             return nodoARetornar;
         }
 
         // Caso 2. b
-        if (nodoEnTurno.esVacioHijoIzquierdo() &&
-                !nodoEnTurno.esVacioHijoDerecho()) {
+        if (nodoEnTurno.esVacioHijoIzquierdo() && !nodoEnTurno.esVacioHijoDerecho()) {
             NodoBinario<T> nodoARetornar = nodoEnTurno.getHijoDerecho();
             nodoEnTurno.setHijoDerecho(NodoBinario.nodoVacio());
             return nodoARetornar;
@@ -108,8 +103,7 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
 
         // Caso 3
         T reemplazo = this.buscarSucesorInOrden(nodoEnTurno.getHijoDerecho());
-        NodoBinario<T> supuestoNuevoHijoDerecho = this.eliminar(
-                nodoEnTurno.getHijoDerecho(), reemplazo);
+        NodoBinario<T> supuestoNuevoHijoDerecho = this.eliminar(nodoEnTurno.getHijoDerecho(), reemplazo);
         nodoEnTurno.setHijoDerecho(supuestoNuevoHijoDerecho);
         nodoEnTurno.setDato(reemplazo);
         return nodoEnTurno;
@@ -156,7 +150,22 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
 
     /* Hacer este metodo */
     public int sizeIt() {
-        return 0;
+        int cantNodos = 0;
+        if (!this.esArbolVacio()) {
+            Stack<NodoBinario<T>> pilaDeNodos = new Stack<>();
+            pilaDeNodos.push(this.raiz);
+            do {
+                NodoBinario<T> nodoAux = pilaDeNodos.pop();
+                cantNodos++;
+                if (!nodoAux.esVacioHijoDerecho()) {
+                    pilaDeNodos.push(nodoAux.getHijoDerecho());
+                }
+                if (!nodoAux.esVacioHijoIzquierdo()) {
+                    pilaDeNodos.push(nodoAux.getHijoIzquierdo());
+                }
+            } while (!pilaDeNodos.isEmpty());
+        }
+        return cantNodos;
     }
 
     @Override
@@ -174,9 +183,26 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
         return sizeXIzq + sizeXDer + 1;
     }
 
-    /* Hacer este metodo */
     public int alturaIt() {
-        return 0;
+        int alturaDelArbol = 0;
+        if (!this.esArbolVacio()) {
+            Queue<NodoBinario<T>> colaDeNodos = new LinkedList<>();
+            colaDeNodos.offer(this.raiz);
+            do {
+                int cantNodosEnLaCola = colaDeNodos.size();
+                for (int i = 0; i < cantNodosEnLaCola; i++) {
+                    NodoBinario<T> nodoAux = colaDeNodos.poll();
+                    if (!nodoAux.esVacioHijoIzquierdo()) {
+                        colaDeNodos.offer(nodoAux.getHijoIzquierdo());
+                    }
+                    if (!nodoAux.esVacioHijoDerecho()) {
+                        colaDeNodos.offer(nodoAux.getHijoDerecho());
+                    }
+                }
+                alturaDelArbol++;
+            } while (!colaDeNodos.isEmpty());
+        }
+        return alturaDelArbol;
     }
 
     @Override
@@ -202,6 +228,25 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
         return 0;
     }
 
+    /* InOrden Recursivo ---------------------------------------------------------
+      Codigo abajo:
+    */
+    @Override
+    public List<T> recorridoEnInOrden() {
+        List<T> recorrido = new ArrayList<>();
+        recorridoEnInOrden(this.raiz, recorrido);
+        return recorrido;
+    }
+
+    private void recorridoEnInOrden(NodoBinario<T> nodoEnTurno, List<T> recorrido) {
+        if (NodoBinario.esNodoVacio(nodoEnTurno)) {
+            return;
+        }
+        recorridoEnInOrden(nodoEnTurno.getHijoIzquierdo(), recorrido);
+        recorrido.add(nodoEnTurno.getDato());
+        recorridoEnInOrden(nodoEnTurno.getHijoDerecho(), recorrido);
+    } // Fin Del Recorrido en InOrden recursivo ----------------------------------
+
     /* InOrden Iterativo ---------------------------------------------------------
     * Se define una listaDeRecorrido generica
     * Cuando el arbol no sea vacio
@@ -209,10 +254,45 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
     * PASO INICIAL:
       Codigo abajo:
     */
-    @Override
-    public List<T> recorridoEnInOrden() {
-        return List.of();
+    public List<T> recorridoEnInOrdenIt() {
+        List<T> recorrido = new LinkedList<>();
+        if (!this.esArbolVacio()) {
+            Stack<NodoBinario<T>> pilaDeNodos = new Stack<>();
+            NodoBinario<T> nodoAux = this.raiz;
+            while (nodoAux != null || !pilaDeNodos.isEmpty()) {
+                while (nodoAux != null) {
+                    pilaDeNodos.push(nodoAux);
+                    nodoAux = nodoAux.getHijoIzquierdo();
+                }
+
+                nodoAux = pilaDeNodos.pop();
+                recorrido.add(nodoAux.getDato());
+
+                nodoAux = nodoAux.getHijoDerecho();
+            }
+        }
+        return recorrido;
     } // Fin Del Recorrido en InOrden iterativo ----------------------------------
+
+    /* PreOrden recursivo ---------------------------------------------------------
+      Codigo abajo:
+    */
+    @Override
+    public List<T> recorridoEnPreOrden() {
+        List<T> recorrido = new ArrayList<>();
+        recorridoEnPreOrden(this.raiz, recorrido);
+        return recorrido;
+    }
+
+    private void recorridoEnPreOrden(NodoBinario<T> nodoEnTurno, List<T> recorrido) {
+        if (NodoBinario.esNodoVacio(nodoEnTurno)) { // Caso base con altura = 0
+            return;
+        }
+
+        recorrido.add(nodoEnTurno.getDato());
+        recorridoEnPreOrden(nodoEnTurno.getHijoIzquierdo(), recorrido);
+        recorridoEnPreOrden(nodoEnTurno.getHijoDerecho(), recorrido);
+    } // Fin Del Recorrido en PreOrden recursivo ---------------------------------
 
     /* PreOrden Iterativo ---------------------------------------------------------
     * Se define una listaDeRecorrido generica
@@ -228,8 +308,7 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
       * Si el hijoIzquierdo del nodoEnTurno no es vacio lo agrega a la pila
       Codigo abajo:
     */
-    @Override
-    public List<T> recorridoEnPreOrden() {
+    public List<T> recorridoEnPreOrdenIt() {
         List<T> listaDeRecorrido = new ArrayList<>();
         if (!this.esArbolVacio()) {
             Stack<NodoBinario<T>> pilaDeNodos = new Stack<>();
@@ -250,6 +329,25 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
     } // Fin Del Recorrido en PreOrden iterativo ---------------------------------
 
 
+    /* PostOrden recursivo ---------------------------------------------------------
+      Codigo abajo:
+    */
+    @Override
+    public List<T> recorridoEnPostOrden() {
+        List<T> recorrido = new ArrayList<>();
+        recorridoEnPostOrden(this.raiz, recorrido);
+        return recorrido;
+    }
+
+    private void recorridoEnPostOrden(NodoBinario<T> nodoAux, List<T> recorrido) {
+        if (NodoBinario.esNodoVacio(nodoAux)) { // Caso base con altura = 0
+            return;
+        }
+        recorridoEnPostOrden(nodoAux.getHijoIzquierdo(), recorrido);
+        recorridoEnPostOrden(nodoAux.getHijoDerecho(), recorrido);
+        recorrido.add(nodoAux.getDato());
+    } // Fin del Recorrido en PostOrden recursivo --------------------------------
+
     /* PostOrden Iterativo ---------------------------------------------------------
     * Se define una listaDeRecorrido generica
     * Cuando el arbol no sea vacio
@@ -257,9 +355,31 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
     * PASO INICIAL:
       Codigo abajo:
     */
-    @Override
-    public List<T> recorridoEnPostOrden() {
-        return List.of();
+    public List<T> recorridoEnPostOrdenIt() {
+        List<T> recorrido = new LinkedList<>();
+        if (!this.esArbolVacio()) {
+            Stack<NodoBinario<T>> pilaDeNodos = new Stack<>();
+            NodoBinario<T> nodoAux = this.raiz;
+            NodoBinario<T> ultimoVisitado = null;
+
+            while (nodoAux != null || !pilaDeNodos.isEmpty()) {
+                while (nodoAux != null) {
+                    pilaDeNodos.push(nodoAux);
+                    nodoAux = nodoAux.getHijoIzquierdo();
+                }
+
+                nodoAux = pilaDeNodos.peek();
+
+                if (!nodoAux.esVacioHijoDerecho() && nodoAux.getHijoDerecho() != ultimoVisitado) {
+                    nodoAux = nodoAux.getHijoDerecho();
+                } else {
+                    recorrido.add(nodoAux.getDato());
+                    ultimoVisitado = pilaDeNodos.pop();
+                    nodoAux = null;
+                }
+            }
+        }
+        return recorrido;
     } // Fin del Recorrido en PostOrden Iterativo --------------------------------
 
     /* Recorrido por Niveles ----------------------------------------------------------
@@ -310,7 +430,7 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
                 if (!nodoAux.esVacioHijoDerecho()) {
                     colaDeNodos.offer(nodoAux.getHijoDerecho());
                 }
-                if (nodoAux.esHoja()){
+                if (nodoAux.esHoja()) {
                     nodosHoja++;
                 }
             } while (!colaDeNodos.isEmpty());
@@ -323,27 +443,27 @@ public class ArbolBinarioBusqueda<T extends Comparable<T>> implements IArbolBusq
     // Representacion del arbol
     @Override
     public String toString() {
-        return generarCadenaDeArbol(this.raiz, "", true);
+        return generarCadenaDeArbol(this.raiz, "", true, "");
     }
 
-
-    private String generarCadenaDeArbol(NodoBinario<T> nodo, String prefijo, boolean esUltimo) {
+    private String generarCadenaDeArbol(NodoBinario<T> nodo, String prefijo, boolean esUltimo, String lado) {
         if (NodoBinario.esNodoVacio(nodo)) {
-            return prefijo + (esUltimo ? "└── " : "├── ") + "∅\n";
+            return prefijo + (esUltimo ? "└── " : "├── ") + lado + "∅\n";
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(prefijo).append(esUltimo ? "└── " : "├── ").append(nodo.getDato()).append("\n");
+        sb.append(prefijo).append(esUltimo ? "└── " : "├── ").append(lado).append(nodo.getDato()).append("\n");
 
         // Determinar si hay hijos para seguir
         boolean tieneHijoIzq = !NodoBinario.esNodoVacio(nodo.getHijoIzquierdo());
         boolean tieneHijoDer = !NodoBinario.esNodoVacio(nodo.getHijoDerecho());
 
         if (tieneHijoIzq || tieneHijoDer) {
-            sb.append(generarCadenaDeArbol(nodo.getHijoIzquierdo(), prefijo + (esUltimo ? "    " : "│   "), false));
-            sb.append(generarCadenaDeArbol(nodo.getHijoDerecho(), prefijo + (esUltimo ? "    " : "│   "), true));
+            sb.append(generarCadenaDeArbol(nodo.getHijoIzquierdo(), prefijo + (esUltimo ? "    " : "│   "), false, "(I) "));
+            sb.append(generarCadenaDeArbol(nodo.getHijoDerecho(), prefijo + (esUltimo ? "    " : "│   "), true, "(D) "));
         }
 
         return sb.toString();
     }
+
 }

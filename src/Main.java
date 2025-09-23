@@ -13,6 +13,9 @@ public class Main {
         arbolDeEnteros.insertar(74);
         arbolDeEnteros.insertar(76);
         System.out.println(arbolDeEnteros);
-        System.out.println("Nodos Hoja: " + arbolDeEnteros.cuantosNodosHojas());
+        System.out.println("Recorrido por niveles: " + arbolDeEnteros.recorridoPorNiveles());
+        System.out.println("Recorrido en PreOrden " + arbolDeEnteros.recorridoEnPreOrden());
+        System.out.println("Recorrido en PostOrden " + arbolDeEnteros.recorridoEnPostOrden());
+        System.out.println("Recorrido en InOrden " + arbolDeEnteros.recorridoEnInOrden());
     }
 }
