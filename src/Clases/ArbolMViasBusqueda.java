@@ -11,7 +11,7 @@ public class ArbolMViasBusqueda<T extends Comparable<T>>
     protected NodoMVias<T> raiz;
     protected int orden;
     protected static final int POSICION_INVALIDA = -1;
-    protected static final int ORDEN_MINIMO = 5;
+    protected static final int ORDEN_MINIMO = 3;
 
     public ArbolMViasBusqueda() {
         this.orden = ArbolMViasBusqueda.ORDEN_MINIMO;
@@ -111,49 +111,46 @@ public class ArbolMViasBusqueda<T extends Comparable<T>>
         if (NodoMVias.esNodoVacio(nodoEnTurno)) {
             throw new ExcepcionDatoNoExiste("El dato a eliminar no existe");
         }
-        for (int i = 0; i < nodoEnTurno.nroDeDatosNoVacios(); i++) {
-            T datoActual = nodoEnTurno.getDato(i);
-            if (datoAEliminar.compareTo(datoActual) == 0) {
-                if (nodoEnTurno.esHoja()) {
-                    eliminarDatoDePosicion(nodoEnTurno, i);
-                    if (nodoEnTurno.nroDeDatosNoVacios() == 0) {
-                        return NodoMVias.nodoVacio();
-                    }
-                    return nodoEnTurno;
-                }
-                //en este punto el nodoEnTurno no es hoja
-                T datoDeReemplazo;
-                if (existenHijosDespuesDePosicion(nodoEnTurno, i)) {
-                    //caso 2
-                    datoDeReemplazo = obtenerSucesorInOrden(nodoEnTurno, datoActual);
-                    if (datoDeReemplazo == null) {
-                        throw new ExcepcionDatoNoExiste("No se pudo encontrar el sucesor para reemplazo");
-                    }
 
-                } else {
-                    //caso 3
-                    datoDeReemplazo = obtenerPredecesorInOrden(nodoEnTurno, datoActual); //Hacer la funcion
-                }
+        // Buscando el dato y actualizando por si hay cambios
+        int posicionDeDatoAEliminar = buscarPosicionDeDatoEnNodo(nodoEnTurno, datoAEliminar);
+        if (posicionDeDatoAEliminar == POSICION_INVALIDA) {
+            int posicionPorDondeBajar = obtenerPosicionPorDondeBajar(nodoEnTurno, datoAEliminar);
+            NodoMVias<T> supuestoNuevoHijo = eliminar(nodoEnTurno.getHijo(posicionPorDondeBajar), datoAEliminar);
+            nodoEnTurno.setHijo(posicionPorDondeBajar, supuestoNuevoHijo);
+            return nodoEnTurno;
+        }
 
-                nodoEnTurno = eliminar(nodoEnTurno, datoDeReemplazo);
-                nodoEnTurno.setDato(i, datoDeReemplazo);
-                return nodoEnTurno;
+        // Caso 1 -> si es hoja
+        if (nodoEnTurno.esHoja()) {
+            eliminarDatoDePosicion(nodoEnTurno, posicionDeDatoAEliminar);
+            if (nodoEnTurno.nroDeDatosNoVacios() == 0) {
+                return NodoMVias.nodoVacio();
             }
+            return nodoEnTurno;
+        }
 
-            if (datoAEliminar.compareTo(datoActual) < 0) {
-                NodoMVias<T> supuestoNuevoHijo = eliminar(nodoEnTurno.getHijo(i), datoAEliminar);
-                nodoEnTurno.setHijo(i, supuestoNuevoHijo);
-                return nodoEnTurno;
-            }
-        } //Fin del for
+        T datoDeReemplazo;
+        if (existenHijosDespuesDePosicion(nodoEnTurno, posicionDeDatoAEliminar)) {
+            datoDeReemplazo = buscarSucesorInOrden(nodoEnTurno, posicionDeDatoAEliminar);
+        } else {
+            datoDeReemplazo = buscarPredecesorInOrden(nodoEnTurno, posicionDeDatoAEliminar);
+        }
 
-        NodoMVias<T> supuestoNuevoHijo = eliminar(nodoEnTurno.getHijo(
-                        nodoEnTurno.nroDeDatosNoVacios()),
-                datoAEliminar);
-        nodoEnTurno.setHijo(nodoEnTurno.nroDeDatosNoVacios(),
-                supuestoNuevoHijo);
+        nodoEnTurno = eliminar(nodoEnTurno, datoDeReemplazo);
+        nodoEnTurno.setDato(posicionDeDatoAEliminar, datoDeReemplazo);
         return nodoEnTurno;
     }
+
+    // todo: IMPLEMENTAR EL "buscarSucesorInOrden" Y "buscarPredecesorInOrden"
+    private T buscarPredecesorInOrden(NodoMVias<T> nodoEnTurno, int posicionDeDatoAEliminar) {
+        return null;
+    }
+
+    private T buscarSucesorInOrden(NodoMVias<T> nodoEnTurno, int posicionDeDatoAEliminar) {
+        return null;
+    }
+    // fin del todo: -----------------------------------------------------------------------------------
 
     protected void eliminarDatoDePosicion(NodoMVias<T> nodoEnTurno, int posicion) {
         for (int i = posicion; i < nodoEnTurno.nroDeDatosNoVacios() - 1; i++) {
@@ -170,33 +167,6 @@ public class ArbolMViasBusqueda<T extends Comparable<T>>
         }
 
         return false;
-    }
-
-    // MEJORAR ESTOS METODOS
-    private T obtenerSucesorInOrden(NodoMVias<T> nodoEnTurno, T datoActual) {
-        List<T> recorrido = recorridoEnInOrden();
-        for (int i = 0; i < recorrido.size(); i++) {
-            if (datoActual.compareTo(recorrido.get(i)) == 0) {
-                if (i + 1 < recorrido.size()) {
-                    return recorrido.get(i + 1);
-                } else {
-                    return null;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private T obtenerPredecesorInOrden(NodoMVias<T> nodoEnTurno, T datoActual) {
-        List<T> recorrido = recorridoEnInOrden();
-        for (int i = 0; i < recorrido.size(); i++) {
-            if (datoActual.compareTo(recorrido.get(i)) == 0) {
-                return i == 0 ? null : recorrido.get(i - 1);
-            }
-        }
-
-        return null;
     }
 
     @Override
@@ -239,47 +209,44 @@ public class ArbolMViasBusqueda<T extends Comparable<T>>
         return buscar(dato) != null;
     }
 
+    // todo: PROBAR SI FUNCIONA EL SIZE Y LA ALTURA
     @Override
     public int size() {
-        int cantidadDeDatos = 0;
-        if (!this.esArbolVacio()) {
-            Stack<NodoMVias<T>> pilaDeNodos = new Stack<>();
-            pilaDeNodos.push(this.raiz);
-            do {
-                NodoMVias<T> nodoAux = pilaDeNodos.pop();
-                if (!NodoMVias.esNodoVacio(nodoAux)) {
-                    cantidadDeDatos += nodoAux.nroDeDatosNoVacios();
-                    for (int i = 0; i <= nodoAux.nroDeDatosNoVacios(); i++) {
-                        pilaDeNodos.push(nodoAux.getHijo(i));
-                    }
-                }
-            } while (!pilaDeNodos.isEmpty());
+        return size(this.raiz);
+    }
+
+    private int size(NodoMVias<T> nodoActual) {
+        if (NodoMVias.esNodoVacio(nodoActual)) {
+            return 0;
         }
-        return cantidadDeDatos;
+
+        int sizeAcum = 0;
+        for (int i = 0; i <= nodoActual.nroDeDatosNoVacios(); i++) {
+            sizeAcum += size(nodoActual.getHijo(i));
+        }
+        return sizeAcum + 1;
     }
 
     @Override
     public int altura() {
-        int alturaDelArbol = 0;
-        if (!this.esArbolVacio()) {
-            Queue<NodoMVias<T>> colaDeNodos = new LinkedList<>();
-            colaDeNodos.offer(raiz);
-            do {
-                NodoMVias<T> nodoAux = colaDeNodos.poll();
-                for (int i = 0; i < nodoAux.nroDeDatosNoVacios(); i++) {
-                    if (!nodoAux.esHijoVacio(i)) {
-                        colaDeNodos.offer(nodoAux.getHijo(i));
-                    }
-                } // Fin del for
-
-                if (!nodoAux.esHijoVacio(nodoAux.nroDeDatosNoVacios())) {
-                    colaDeNodos.offer(nodoAux.getHijo(nodoAux.nroDeDatosNoVacios()));
-                }
-                alturaDelArbol++;
-            } while (!colaDeNodos.isEmpty());
-        }
-        return alturaDelArbol;
+        return altura(this.raiz);
     }
+
+    private int altura(NodoMVias<T> nodoActual) {
+        if (NodoMVias.esNodoVacio(nodoActual)) {
+            return 0;
+        }
+
+        int alturaMay = 0;
+        for (int i = 0; i <= nodoActual.nroDeDatosNoVacios(); i++) {
+            int alturaDeHijo = altura(nodoActual.getHijo(i));
+            if (alturaDeHijo > alturaMay) {
+                alturaMay = alturaDeHijo;
+            }
+        }
+        return alturaMay + 1;
+    }
+    // Fin del todo: -----------------------------------------------------------------------
 
     @Override
     public int nivel(T dato) {
